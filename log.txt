@@ -22,3 +22,9 @@ Timestamp: Wed Nov 29 2023 04:54:01 GMT-0800 (Pacific Standard Time)
 URL: /favicon.ico
 Timestamp: Wed Nov 29 2023 04:54:01 GMT-0800 (Pacific Standard Time)
 
+::1 - - [11/Dec/2023:14:22:00 +0000] "GET /secreturl HTTP/1.1" 200 51 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+::1 - - [11/Dec/2023:14:22:54 +0000] "GET /css/styles.css HTTP/1.1" 404 153 "http://localhost:8080/documentation" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+::1 - - [11/Dec/2023:14:22:54 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "http://localhost:8080/documentation" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+::1 - - [11/Dec/2023:14:24:42 +0000] "GET /secreturl HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+::1 - - [11/Dec/2023:14:38:24 +0000] "GET /secreturl HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+::1 - - [11/Dec/2023:14:38:30 +0000] "GET /mistka HTTP/1.1" 404 145 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
