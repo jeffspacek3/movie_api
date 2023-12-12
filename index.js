@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
   res.send('Welcome to my movie club and theater!');
 });
 
-app.get('/documentation', (req, res) => {
+app.get((req, res) => {
   res.sendFile('public/documentation.html', { root: __dirname });
 });
 
@@ -37,7 +37,7 @@ app.get('/movies', (req, res) => {
 
 
 // express static
-app.use('documentation.html', express.static('public'));
+app.use(express.static('public'));
 
 // create a write stream (in append mode)
 // a ‘log.txt’ file is created in root directory
