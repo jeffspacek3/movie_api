@@ -1,5 +1,6 @@
 
 const express = require("express");
+morgan = require("morgan");
 const app = express("express");
 const bodyParser = require("body-parser");
 uuid = require("uuid");
@@ -8,9 +9,22 @@ const Models = require("./models.js");
 const Movies = Models.Movie;
 const Users = Models.Users;
 
+app.use(bodyParser.json()); // USE JSON FORMATTING
+app.use(bodyParser.urlencoded({ extended: true }));
+
+//IMPORT auth.js
+let auth = require("./auth")(app);
+
+//IMPORT passport and passport.js
+const passport = require("passport");
+require("./passport");
+
+//LOG ALL REQUESTS
+app.use(morgan("common"));
 
 mongoose.connect("mongodb://localhost:27017/myflixcollection",
   { useNewUrlParser: true, useUnifiedTopology: true });
+
 
 
 
@@ -22,19 +36,19 @@ app.post("/users", (req, res) => {
         return res.status(400).send(req.body.Username + "already exists");
       } else {
         Users.create({
-            Username: req.body.Username,
-            Password: req.body.Password,
-            Email: req.body.Email,
-            Birthday: req.body.Birthday,
-          })
-          .then((user) => { 
-            res.status(201).json(user) 
+          Username: req.body.Username,
+          Password: req.body.Password,
+          Email: req.body.Email,
+          Birthday: req.body.Birthday
+        })
+          .then((user) => {
+            res.status(201).json(user)
           })
           .catch((error) => {
             console.error(error);
             res.status(500).send("Error: " + error);
           });
-      }
+      };
     })
     .catch((error) => {
       console.error(error);
@@ -108,22 +122,6 @@ app.put("/users/:Username", async (req, res) => {
 });
 
 
-// Delete a user by username
-app.delete("/users/:Username", (req, res) => {
-  Users.findOneAndRemove({ Username: req.params.Username })
-    .then((user) => {
-      if (user) {
-        res.status(400).send(req.params.Username + " was not found");
-      } else {
-        res.status(200).send(req.params.Username + " was deleted");
-      };
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error: " + err);
-    });
-});
-
 
 //UPDATE
 app.put("/users/:UserName", (req, res) => {
@@ -169,6 +167,22 @@ app.delete('/users/:id', (req, res) => {
   };
 });
 
+
+// Delete a user by username
+app.delete("/users/:Username", (req, res) => {
+  Users.findOneAndRemove({ Username: req.params.Username })
+    .then((user) => {
+      if (!user) {
+        res.status(400).send(req.params.Username + " was not found");
+      } else {
+        res.status(200).send(req.params.Username + " was deleted");
+      };
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
+});
 
 
 //READ SECTION
@@ -229,26 +243,28 @@ app.get("/movies/:Title", (req, res) => {
 
 
 //READ MOVIE GENRE.....
-app.get("/movies/genre/:genreName", (req, res) => {
-  const { genreName } = req.params;
-  const genre = movies.find(movie => movie.Genre.Name === genreName).Genre;
-  if (genre) {
-    res.status(200).json(genre);
-  } else {
-    res.status(400).send('Genre Not Found')
-  }
+app.get("/movies/genres/:genreName", (req, res) => {
+  Movies.findOne({ "Genre.Name": req.params.genreName })
+  .then((movie) => {
+res.status (200).json(movie.Genre);
+  })
+.catch((err) => {
+console.error(err);
+res.status(500).send("Error:" + error );
+});
 });
 
 
-//READ ALL DIRECTORS.....
-app.get("/movies/director/:directorName", (req, res) => {
-  const { directorName } = req.params;
-  const director = movies.find(movie => movie.Director.Name === directorName).Director;
-  if (director) {
-    res.status(200).json(director);
-  } else {
-    res.status(400).send('Director Not Found')
-  };
+//READ Director by name
+app.get("/movies/directors/:directorName", async (req, res) => {
+  Movies.findOne({ "Director.Name": req.params.directorName })
+    .then((Movie) => {
+      res.json(Movie);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error:" + error);
+    });
 });
 
 
