@@ -3,7 +3,7 @@ const passport = require("passport"),
   Models = require("./models.js"),
   passportJWT = require("passport-jwt");
 
-let Users = Models.User,
+let Users = Models.Users,
   JWTStrategy = passportJWT.Strategy,
   ExtractJWT = passportJWT.ExtractJwt;
 
@@ -14,7 +14,7 @@ passport.use(
       passwordField: "Password",
     },
     async (username, password, callback) => {
-      console.log(`${username} ${password}`);
+      console.log("${username} ${password}");
       await Users.findOne({ Username: username })
       .then((user) => {
         if (!user) {
