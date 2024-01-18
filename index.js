@@ -1,4 +1,3 @@
-
 const express = require("express");
 const app = express("express");
 
@@ -31,29 +30,36 @@ require("./passport");
 // include(s) new validator as middleware to the routes that require validation
 const { check, validationResult } = require("express-validator");
 
-mongoose.connect("mongodb://localhost:27017/myflixcollection",
-  { useNewUrlParser: true, useUnifiedTopology: true });
-
+// mongoose connection from local computer
+mongoose.connect("mongodb://localhost:27017/myflixcollection", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+/*
+  // connecting with mongoDB Driver.... broken needs work
+  mongoose.connect(process.env."CONNECTION_URI",
+    { useNewUrlParser: true, useUnifiedTopology: true });
+*/
 let allowedOrigins = ["http://localhost:8080', 'http://testsite.com"];
 
 /* creates a list of allowed domains within the variable(allowedOrigins),
 then compares the domains of any incoming request with this list and either allows (if the domain is on the list) it
 or return an error (if the domain isn't on the list) */
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      // If a specific origin isn’t found on the list of allowed origins
-      let message = "The CORS policy for this application doesn’t allow access from origin " + origin;
-      return callback(new Error(message), false);
-    }
-    return callback(null, true);
-  }
-}));
-
-
-
-
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        // If a specific origin isn’t found on the list of allowed origins
+        let message =
+          "The CORS policy for this application doesn’t allow access from origin " +
+          origin;
+        return callback(new Error(message), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 // add new user
 /* expected in JSON in this format
@@ -66,7 +72,8 @@ app.use(cors({
 }*/
 
 // add a new user to the database
-app.post("/users/",
+app.post(
+  "/users/",
   /*
     Validation logic here for request
     -you can either use a chain of methods like .not().isEmpty()
@@ -85,30 +92,32 @@ app.post("/users/",
     let errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
     let hashedPassword = users.hashPassword(req.body.Password);
-    await users.findOne({ Username: req.body.Username })
+    await users
+      .findOne({ Username: req.body.Username })
       // search to see if a user with the requested user name already exists
       .then((user) => {
         if (user) {
           // if the user is found, spend appropriate response
           return res.status(400).send(req.body.Username + " already exists!");
         } else {
-          users.create({
-            Username: req.body.Username,
-            Password: hashedPassword,
-            Email: req.body.Email,
-            Birthday: req.body.Birthday,
-          })
+          users
+            .create({
+              Username: req.body.Username,
+              Password: hashedPassword,
+              Email: req.body.Email,
+              Birthday: req.body.Birthday,
+            })
             .then((user) => {
               res.status(201).json(user);
             })
             .catch((error) => {
               console.error(error);
               res.status(500).send("Error: " + error);
-            })
+            });
         }
       })
       .catch((error) => {
@@ -118,52 +127,35 @@ app.post("/users/",
   }
 );
 
-/*
-// Allow users to add a movie to their list of favorites
-app.post("/users/:Username/movies/:movietitle", 
-passport.authenticate("jwt", {session: false}),
-async (req, res) => {
-  await users.findOneAndUpdate({ Username: req.params.Username }, {
-    $push: { favoriteMovies: req.params.MovieTitle },
-  },
-    { new: true }) // This line makes sure that the updated document is returned
-    .then((updatedUser) => {
-      res.json(updatedUser);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error: " + err);
-    });
-});
-
-
-//});
-//duplicate...?
-*/
-
-
-
-
-
 //NEEDS WORK
 // add a movie to a user's list of favorites
-app.post("/users/:Username/movies/:movieTitle", async (req, res) => {
-  await users.findOneAndUpdate({ Username: req.params.Username }, {
-    $push: { FavoriteMovies: req.params.movieTitle }
-  },
-    { new: true }) // This line makes sure that the updated document is returned
-    .then((updatedUser) => {
-      res.json(updatedUser);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error: " + err);
-    });
-});
-
-
-
-
+app.post(
+  "/users/:Username/movies/:MovieID",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    //condition to check added here
+    if (req.user.Username !== req.params.Username) {
+      return res.status(400).send("Permission Denied");
+    }
+    // condition ends
+    await users
+      .findOneAndUpdate(
+        { Username: req.params.Username },
+        {
+          $push: { Favoritemovies: req.params.MovieID },
+        },
+        { new: true }
+      )
+      // This line makes sure that the updated document is returned
+      .then((updatedUser) => {
+        res.json(updatedUser);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send("Error: " + err);
+      });
+  }
+);
 
 // Update a user's info, by username
 /* JSON required in this format
@@ -176,41 +168,51 @@ app.post("/users/:Username/movies/:movieTitle", async (req, res) => {
   (required)
   Birthday: Date
 }*/
-app.put("/users/:Username",
+app.put(
+  "/users/:Username",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     //condition to check added here
-    if (req.user.Username !== req.params.Username) { return res.status(400).send("Permission Denied") };
+    if (req.user.Username !== req.params.Username) {
+      return res.status(400).send("Permission Denied");
+    }
     // condition ends
-    await users.findOneAndUpdate({ Username: req.params.Username }, {
-      $set:
-      {
-        Username: req.body.Username,
-        Password: req.body.Password,
-        Email: req.body.Email,
-        Birthday: req.body.Birthday,
-        FavoriteMovies: req.body.FavoriteMovies,
-      }
-    },
-      { new: true }) // This line makes sure that the updated document is returned
+    await users
+      .findOneAndUpdate(
+        { Username: req.params.Username },
+        {
+          $set: {
+            Username: req.body.Username,
+            Password: req.body.Password,
+            Email: req.body.Email,
+            Birthday: req.body.Birthday,
+          },
+        },
+        { new: true }
+      )
+      // This line makes sure that the updated document is returned
       .then((updatedUser) => {
         res.json(updatedUser);
       })
       .catch((err) => {
         console.error(err);
         res.status(500).send("Error: " + err);
-      })
-  });
-
+      });
+  }
+);
 
 // delete a user by username
-app.delete("/users/:Username",
+app.delete(
+  "/users/:Username",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     //condition to check added here
-    if (req.user.Username !== req.params.Username) { return res.status(400).send("Permission Denied") };
+    if (req.user.Username !== req.params.Username) {
+      return res.status(400).send("Permission Denied");
+    }
     // condition ends
-    users.findOneAndDelete({ Username: req.params.Username })
+    users
+      .findOneAndDelete({ Username: req.params.Username })
       .then((user) => {
         if (!user) {
           res.status(400).send(req.params.Username + " was not found");
@@ -222,11 +224,38 @@ app.delete("/users/:Username",
         console.error(err);
         res.status(500).send("Error: " + err);
       });
+  }
+);
+
+///NEED TO TEST!
+
+/*
+  app.delete("/users/:Username/movies/:MovieID",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const { Username, MovieID } = req.params;
+    try {
+      const updatedUser = await Users.findOneAndUpdate(
+        { Username: Username },
+        {
+          $pull: { FavoriteMovies: MovieID },
+        },
+        { new: true }
+      );
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      res.json(updatedUser);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error: " + error);
+    }
   });
 
+*/
 
-
-
+/*
 
 //NEEDS work
 //NEED TO ADD MOVIE TITLE FIRST
@@ -237,7 +266,7 @@ app.delete('/users/:id/:movieTitle', (req, res) => {
   let user = users.find(user => user.id == id);
 
   if (user) {
-    user.favoriteMovies = user.favoriteMovies.filter(title => title !== movieTitle)
+    user.Favoriteovies = user.Favoriteovies.filter(title => title !== movieTitle)
     res.status(200).send(' ${movieTitle} has been removed from ${id}s array');
   } else {
     res.status(400).send('no such movie')
@@ -245,28 +274,31 @@ app.delete('/users/:id/:movieTitle', (req, res) => {
 });
 
 
-
-
+*/
 
 //READ SECTION
 
-
 // read the welcome page
-app.get("/",
+app.get(
+  "/",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     res.send("Welcome to my movie club and theater!");
-  });
-
+  }
+);
 
 // read current users
-app.get("/users",
+app.get(
+  "/users",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     //condition to check added here
-    if (req.user.Username !== req.params.Username) { return res.status(400).send("Permission Denied") };
+    if (req.user.Username !== req.params.Username) {
+      return res.status(400).send("Permission Denied");
+    }
     // condition ends
-    await users.find()
+    await users
+      .find()
       .then((user) => {
         res.status(201).json(user);
       })
@@ -274,17 +306,21 @@ app.get("/users",
         console.error(err);
         res.status(500).send("Error: " + err);
       });
-  });
-
+  }
+);
 
 // read current users by username
-app.get("/users/:Username",
+app.get(
+  "/users/:Username",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     //condition to check added here
-    if (req.user.Username !== req.params.Username) { return res.status(400).send("Permission Denied") };
+    if (req.user.Username !== req.params.Username) {
+      return res.status(400).send("Permission Denied");
+    }
     // condition ends
-    await users.findOne({ Username: req.params.Username })
+    await users
+      .findOne({ Username: req.params.Username })
       .then((user) => {
         res.status(201).json(user);
       })
@@ -292,14 +328,16 @@ app.get("/users/:Username",
         console.error(err);
         res.status(500).send("Error: " + err);
       });
-  });
-
+  }
+);
 
 // generate a list of the entire movie collection
-app.get("/movies",
+app.get(
+  "/movies",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    await movies.find()
+    await movies
+      .find()
       .then((movie) => {
         res.status(201).json(movie);
       })
@@ -307,35 +345,38 @@ app.get("/movies",
         console.error(err);
         res.status(500).send("Error: " + err);
       });
-  });
-
+  }
+);
 
 // read one movie by its title
-app.get("/movies/:Title",
+app.get(
+  "/movies/:Title",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    await movies.findOne({ Title: req.params.Title })
+    await movies
+      .findOne({ Title: req.params.Title })
       .then((movies) => {
         res.json(movies);
       })
       .catch((err) => {
         console.error(err);
         res.status(500).send("Error: " + err);
-      })
-  });
-
-
+      });
+  }
+);
 
 //Needs work, working partially
 //movies/genres/Thriller is not working but the others are...?
 
 // read movies by genre
-app.get("/movies/genres/:genreName",
+app.get(
+  "/movies/genres/:genreName",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    movies.find({ Genre: req.params.genreName })
+    movies
+      .find({ Genre: req.params.genreName })
       .then((movies) => {
-        res.status(200).json(movies)
+        res.status(200).json(movies);
       })
       .catch((err) => {
         console.error(err);
@@ -344,18 +385,16 @@ app.get("/movies/genres/:genreName",
   }
 );
 
-
-
-
-
 // needswork!
 //input 1 director, sends another specific director......
 
 // read movie(s) by director
-app.get("/movies/directors/:DirectorName",
+app.get(
+  "/movies/directors/:DirectorName",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    await movies.findOne({ "Director.Name": req.params.directorName })
+    await movies
+      .findOne({ "Director.Name": req.params.directorName })
       .then((movies) => {
         res.status(200).json(movies);
       })
@@ -365,23 +404,20 @@ app.get("/movies/directors/:DirectorName",
   }
 );
 
-
-
-
 // serves the documentation.html page
-app.get("/documentation",
+app.get(
+  "/documentation",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     res.sendFile("public/documentation.html", { root: __dirname });
-  });
-
+  }
+);
 
 // error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Internal Server Error");
 });
-
 
 // start server
 const port = process.env.PORT || 8080;
@@ -390,7 +426,6 @@ app.listen(port, "0.0.0.0", () => {
   console.log("Listening on Port " + port);
 });
 
-
 //END NOTES
 /*
 
@@ -398,9 +433,8 @@ app.listen(port, "0.0.0.0", () => {
 TO-DO LIST
 -looking up movies by genre
 -updating a users favorite movies
--deleting a uers movie from their favorites list
--read a director by name
-
+-deleting a users movie from their favorites list
+-read director by name
 
 
 bonus tasks
@@ -412,39 +446,4 @@ bonus tasks
 /// install... txt.log recording code...
 
 
-
-
-
-CODE THAT MAYBE A DUPLICATE BUT KEEP JUST IN CASE
-
-//duplicate...?
-//Add a movie to a users list of favoriteMovies
-//app post("/users/:id/:movietitle", (req, res) => {
-//const { id, movieTitle } = req.params;
-
-let user = users.find(user => user.id == id);
-
-if (user) {user.FavoriteMovies.push(movieTitle);res.status(200).send(' ${movieTitle} has been added to user ${id}s array');
-} else {res.status(400).send('no such movie')
-};
-
-//});
-//duplicate...?
-*/
-
-/*
-// Add a movie to a user's list of favorites
-app.post('/users/:Username/movies/:MovieID', async (req, res) => {
-  await Users.findOneAndUpdate({ Username: req.params.Username }, {
-     $push: { FavoriteMovies: req.params.MovieID }
-   },
-   { new: true }) // This line makes sure that the updated document is returned
-  .then((updatedUser) => {
-    res.json(updatedUser);
-  })
-  .catch((err) => {
-    console.error(err);
-    res.status(500).send(‘Error: ’ + err);
-  });
-});
 */
