@@ -7,40 +7,39 @@ uuid = require("uuid");
 const mongoose = require("mongoose");
 const Models = require("./models.js");
 
+//integrating mongoose with rest api
 const movies = Models.Movie;
 const users = Models.Users;
 
-// middleware for parsing requests
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
 //middleware for CORS
-
 const cors = require("cors");
 app.use(cors());
 
+// middleware for parsing requests
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 //security
-const bcrypt = require("bcrypt");
+const bcryptjs = require("bcryptjs");
 
 let auth = require("./auth")(app);
-const passport = require("passport");
 
+//authentication logic
+const passport = require("passport");
 require("./passport");
 
 // include(s) new validator as middleware to the routes that require validation
 const { check, validationResult } = require("express-validator");
 
-// mongoose connection from local computer
-mongoose.connect("mongodb://localhost:27017/myflixcollection", {
+
+// connect datebase to api
+mongoose.connect(process.env.CONNECTION_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-/*
-  // connecting with mongoDB Driver.... broken needs work
-  mongoose.connect(process.env."CONNECTION_URI",
-    { useNewUrlParser: true, useUnifiedTopology: true });
-*/
-let allowedOrigins = ["http://localhost:8080', 'http://testsite.com"];
+
+
+let allowedOrigins = ["http://localhost:8080", "http://testsite.com"];
 
 /* creates a list of allowed domains within the variable(allowedOrigins),
 then compares the domains of any incoming request with this list and either allows (if the domain is on the list) it
