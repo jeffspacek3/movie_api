@@ -1,3 +1,6 @@
+require("dotenv").config();
+dontenv.config()
+
 const express = require("express");
 const app = express("express");
 
@@ -15,6 +18,12 @@ const users = Models.Users;
 const cors = require("cors");
 app.use(cors());
 
+// connect datebase to api
+mongoose.connect(process.env.CONNECTION_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 // middleware for parsing requests
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -22,7 +31,7 @@ app.use(bodyParser.json());
 //security
 const bcryptjs = require("bcryptjs");
 
-let auth = require("./auth")(app);
+let auth = require("./auth.js")(app);
 
 //authentication logic
 const passport = require("passport");
@@ -31,15 +40,13 @@ require("./passport");
 // include(s) new validator as middleware to the routes that require validation
 const { check, validationResult } = require("express-validator");
 
-
-// connect datebase to api
-mongoose.connect(process.env.CONNECTION_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-
-let allowedOrigins = ["http://localhost:8080", "http://testsite.com"];
+let allowedOrigins = [
+  "http://localhost:8080",
+  "http://localhost:4200",
+  "http://localhost:1234",
+  "http://localhost:0000",
+  "https://cinemark-movie-flix-d567da194f3d.herokuapp.com",
+];
 
 /* creates a list of allowed domains within the variable(allowedOrigins),
 then compares the domains of any incoming request with this list and either allows (if the domain is on the list) it
@@ -280,7 +287,7 @@ app.delete('/users/:id/:movieTitle', (req, res) => {
 // read the welcome page
 app.get(
   "/",
-  passport.authenticate("jwt", { session: false }),
+  /*passport.authenticate("jwt", { session: false }), */
   async (req, res) => {
     res.send("Welcome to my movie club and theater!");
   }
@@ -418,12 +425,14 @@ app.use((err, req, res, next) => {
   res.status(500).send("Internal Server Error");
 });
 
-// start server
-const port = process.env.PORT || 8080;
-// listen for requests
+// Port
+const port = process.env.port || 8080;
+
+// listen for request
 app.listen(port, "0.0.0.0", () => {
   console.log("Listening on Port " + port);
 });
+
 
 //END NOTES
 /*
