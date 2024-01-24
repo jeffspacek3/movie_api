@@ -285,10 +285,7 @@ app.delete('/users/:id/:movieTitle', (req, res) => {
 //READ SECTION
 
 // read the welcome page
-app.get(
-  "/",
-  /*passport.authenticate("jwt", { session: false }), */
-  async (req, res) => {
+app.get("/", async (req, res) => {
     res.send("Welcome to my movie club and theater!");
   }
 );
