@@ -1,5 +1,4 @@
 require("dotenv").config();
-dontenv.config()
 
 const express = require("express");
 const app = express("express");
