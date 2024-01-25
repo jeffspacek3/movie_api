@@ -336,7 +336,6 @@ app.get(
 // generate a list of the entire movie collection
 app.get(
   "/movies",
-  passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     await movies
       .find()
