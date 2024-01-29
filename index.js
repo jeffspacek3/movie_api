@@ -129,7 +129,6 @@ app.post(
   }
 );
 
-//NEEDS WORK
 // add a movie to a user's list of favorites
 app.post(
   "/users/:Username/movies/:MovieID",
@@ -144,7 +143,7 @@ app.post(
       .findOneAndUpdate(
         { Username: req.params.Username },
         {
-          $push: { Favoritemovies: req.params.MovieID },
+          $push: { FavoriteMovies: req.params.MovieID },
         },
         { new: true }
       )
@@ -333,7 +332,6 @@ app.get(
 );
 
 // generate a list of the entire movie collection
-//not working?
 app.get(
   "/movies",
   async (req, res) => {
