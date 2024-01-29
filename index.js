@@ -339,7 +339,7 @@ app.get(
   async (req, res) => {
     await movies
       .find()
-      .then((movie) => {
+      .then((movies) => {
         res.status(201).json(movies);
       })
       .catch((err) => {
