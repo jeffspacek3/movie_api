@@ -41,9 +41,6 @@ const { check, validationResult } = require("express-validator");
 
 let allowedOrigins = [
   "http://localhost:8080",
-  "http://localhost:4200",
-  "http://localhost:1234",
-  "http://localhost:0000",
   "https://cinemark-movie-flix-d567da194f3d.herokuapp.com",
 ];
 
@@ -76,7 +73,7 @@ app.use(
   Birthday: Date
 }*/
 
-// add a new user to the database
+// allow new users to register
 app.post(
   "/users/",
   /*
@@ -232,9 +229,9 @@ app.delete(
   }
 );
 
-///NEED TO TEST!
 
 /*
+// Allow users to remove a movie from their list of favorites
   app.delete("/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
@@ -257,8 +254,8 @@ app.delete(
       res.status(500).send("Error: " + error);
     }
   });
-
 */
+
 
 /*
 
@@ -284,7 +281,9 @@ app.delete('/users/:id/:movieTitle', (req, res) => {
 //READ SECTION
 
 // read the welcome page
-app.get("/", async (req, res) => {
+app.get(
+  "/",
+  async (req, res) => {
     res.send("Welcome to my movie club and theater!");
   }
 );
@@ -334,13 +333,14 @@ app.get(
 );
 
 // generate a list of the entire movie collection
+//not working?
 app.get(
   "/movies",
   async (req, res) => {
     await movies
       .find()
       .then((movie) => {
-        res.status(201).json(movie);
+        res.status(201).json(movies);
       })
       .catch((err) => {
         console.error(err);
@@ -349,7 +349,7 @@ app.get(
   }
 );
 
-// read one movie by its title
+// return data about a single movie by title to the user
 app.get(
   "/movies/:Title",
   passport.authenticate("jwt", { session: false }),
@@ -368,14 +368,13 @@ app.get(
 
 //Needs work, working partially
 //movies/genres/Thriller is not working but the others are...?
-
 // read movies by genre
 app.get(
-  "/movies/genres/:genreName",
+  "/movies/genres/:GenreName",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     movies
-      .find({ Genre: req.params.genreName })
+      .find({ Genre: req.params.GenreName })
       .then((movies) => {
         res.status(200).json(movies);
       })
