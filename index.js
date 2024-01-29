@@ -364,8 +364,6 @@ app.get(
   }
 );
 
-//Needs work, working partially
-//movies/genres/Thriller is not working but the others are...?
 // read movies by genre
 app.get(
   "/movies/genres/:GenreName",
@@ -429,21 +427,15 @@ app.listen(port, "0.0.0.0", () => {
 //END NOTES
 /*
 
-
 TO-DO LIST
--looking up movies by genre
--updating a users favorite movies
--deleting a users movie from their favorites list
+-add/delete a users movie from their favorites list
 -read director by name
 
-
-bonus tasks
-//optional
+Bonus tasks
 //allo users to see which actors star in which movies
 //allow users to view information about different actors
 //allow users to view more information about different movies
 //allow users to crate a to watch list
-/// install... txt.log recording code...
-
+// install... txt.log recording code...
 
 */
