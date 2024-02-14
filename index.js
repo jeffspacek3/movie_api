@@ -42,6 +42,7 @@ const { check, validationResult } = require("express-validator");
 let allowedOrigins = [
   "http://localhost:8080",
   "https://cinemark-movie-flix-d567da194f3d.herokuapp.com",
+  "http://localhost:1234",
 ];
 
 /* creates a list of allowed domains within the variable(allowedOrigins),
@@ -382,6 +383,7 @@ app.get(
   }
 );
 
+
 // needswork!
 //input 1 director, sends another specific director......
 
@@ -400,6 +402,7 @@ app.get(
       });
   }
 );
+
 
 // serves the documentation.html page
 app.get(
