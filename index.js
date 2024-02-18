@@ -135,27 +135,21 @@ app.post(
   "/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    //condition to check added here
-    if (req.user.Username !== req.params.Username) {
-      return res.status(400).send("Permission Denied");
+    Users.findOneAndUpdate(
+      { Username: req.params.Usernae },
+      {$addToSet: { FavoritesMovies: req.params.MovieID },
     }
-    // condition ends
-    await users
-      .findOneAndUpdate(
-        { Username: req.params.Username },
-        {
-          $push: { Favoritemovies: req.params.MovieID },
-        },
-        { new: true }
-      )
-      // This line makes sure that the updated document is returned
-      .then((updatedUser) => {
-        res.json(updatedUser);
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send("Error: " + err);
-      });
+    { new: true }
+    )
+    .then((user) => {
+      res.status(200).json(user);
+    })
+
+    .catch((err) =>{
+      console.error(err);
+      res.status(500).send("Erroer: " + err);
+    });
+
   }
 );
 
@@ -230,7 +224,7 @@ app.delete(
 );
 
 
-/*
+
 // Allow users to remove a movie from their list of favorites
   app.delete("/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
@@ -254,10 +248,10 @@ app.delete(
       res.status(500).send("Error: " + error);
     }
   });
-*/
 
 
-/*
+
+
 
 //NEEDS work
 //NEED TO ADD MOVIE TITLE FIRST
@@ -274,9 +268,6 @@ app.delete('/users/:id/:movieTitle', (req, res) => {
     res.status(400).send('no such movie')
   };
 });
-
-
-*/
 
 //READ SECTION
 
