@@ -226,7 +226,7 @@ app.delete(
 
 
 // Allow users to remove a movie from their list of favorites
-  app.delete("/users/:Username/movies/:MovieID",
+  app.delete("/users/:Username/favorites/:MovieID",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     const { Username, MovieID } = req.params;
