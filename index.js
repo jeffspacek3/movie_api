@@ -132,19 +132,21 @@ app.post(
 
 // add a movie to a user's list of favorites
 app.post(
-  "/users/:Username/favorites/:MovieID",
+  "/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    Users.findOneAndUpdate(
-      { Username: req.params.Usernae },
-      { $addToSet: { FavoritesMovies: req.params.MovieID },
+    if(req.user.Username !== req.params.Username){
+      return res.status(400).send("Permission denied");
+    }
+    await Users.findOneAndUpdate(
+      { Username: req.params.Username },
+      { $push: { FavoritesMovies: req.params.MovieID },
     },
     { new: true },
     )
-    .then((user) => {
-      res.status(200).json(user);
+    .then((updatedUser) => {
+      res.json(updatedUser);
     })
-
     .catch((err) =>{
       console.error(err);
       res.status(500).send("Erroer: " + err);
@@ -419,8 +421,8 @@ app.listen(port, "0.0.0.0", () => {
 });
 
 
-//END NOTES
-/*
+/* End Notes
+
 
 TO-DO LIST
 -add/delete a users movie from their favorites list
