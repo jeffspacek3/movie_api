@@ -138,6 +138,7 @@ app.post(
     if(req.user.Username !== req.params.Username){
       return res.status(400).send("Permission denied");
     }
+    console.log(req.params)
     await Users.findOneAndUpdate(
       { Username: req.params.Username },
       { $push: { FavoritesMovies: req.params.MovieID },
@@ -149,7 +150,7 @@ app.post(
     })
     .catch((err) =>{
       console.error(err);
-      res.status(500).send("Erroer: " + err);
+      res.status(500).send("Error: " + err);
     });
 
   }
