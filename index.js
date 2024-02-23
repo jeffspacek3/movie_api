@@ -135,24 +135,23 @@ app.post(
   "/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    if(req.user.Username !== req.params.Username){
+    if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission denied");
     }
-    console.log(req.params)
-    await users.findOneAndUpdate(
-      { Username: req.params.Username },
-      { $push: { FavoriteMovies: req.params.MovieID },
-    },
-    { new: true },
-    )
-    .then((updatedUser) => {
-      res.json(updatedUser);
-    })
-    .catch((err) =>{
-      console.error(err);
-      res.status(500).send("Error: " + err);
-    });
-
+    console.log(req.params);
+    await users
+      .findOneAndUpdate(
+        { Username: req.params.Username },
+        { $push: { FavoriteMovies: req.params.MovieID } },
+        { new: true }
+      )
+      .then((updatedUser) => {
+        res.json(updatedUser);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send("Error: " + err);
+      });
   }
 );
 
@@ -226,61 +225,56 @@ app.delete(
   }
 );
 
-
-
 // Allow users to remove a movie from their list of favorites
-  app.delete("/users/:Username/favorites/:MovieID",
+app.delete(
+  "/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    const { Username, MovieID } = req.params;
+    //condition to check added here
+    if (req.user.Username !== req.params.Username) {
+      return res.status(400).send("Permission Denied");
+    }
+    //condition ends
+    console.log(req.params);
+    users.findOneAndDelete({ MovieID });
+    const { MovieID } = req.params;
     try {
-      const updatedUser = await users.findOneAndUpdate(
+      const updatedUser = await User.findOneAndUpdate(
         { Username: Username },
         {
           $pull: { FavoriteMovies: MovieID },
         },
         { new: true }
       );
+      let user = users.find((user) => user.id == id);
       if (!updatedUser) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+      if (user) {
+        user.Favoritemovies = user.Favoritemovies.filter(
+          (title) => title !== movieID
+        );
+        res
+          .status(200)
+          .send(" ${movieTitle} has been removed from ${id}s array");
+      } else {
+        res.status(400).send("no such movie");
+      }
+
       res.json(updatedUser);
     } catch (error) {
       console.error(error);
       res.status(500).send("Error: " + error);
     }
-  });
-
-
-
-
-
-//NEEDS work
-//NEED TO ADD MOVIE TITLE FIRST
-//Deletes a users movie title...
-app.delete('/users/:id/:movieTitle', (req, res) => {
-  const { id, movieTitle } = req.params;
-
-  let user = users.find(user => user.id == id);
-
-  if (user) {
-    user.Favoriteovies = user.Favoriteovies.filter(title => title !== movieTitle)
-    res.status(200).send(' ${movieTitle} has been removed from ${id}s array');
-  } else {
-    res.status(400).send('no such movie')
-  };
-});
+  }
+);
 
 //READ SECTION
 
 // read the welcome page
-app.get(
-  "/",
-  async (req, res) => {
-    res.send("Welcome to my movie club and theater!");
-  }
-);
+app.get("/", async (req, res) => {
+  res.send("Welcome to my movie club and theater!");
+});
 
 // read current users
 app.get(
@@ -377,7 +371,6 @@ app.get(
   }
 );
 
-
 // needswork!
 //input 1 director, sends another specific director......
 
@@ -396,7 +389,6 @@ app.get(
       });
   }
 );
-
 
 // serves the documentation.html page
 app.get(
@@ -420,7 +412,6 @@ const port = process.env.PORT || 8080;
 app.listen(port, "0.0.0.0", () => {
   console.log("Listening on Port " + port);
 });
-
 
 /* End Notes
 
