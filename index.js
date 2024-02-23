@@ -234,7 +234,7 @@ app.delete(
   async (req, res) => {
     const { Username, MovieID } = req.params;
     try {
-      const updatedUser = await Users.findOneAndUpdate(
+      const updatedUser = await users.findOneAndUpdate(
         { Username: Username },
         {
           $pull: { FavoriteMovies: MovieID },
