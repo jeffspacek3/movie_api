@@ -230,42 +230,23 @@ app.delete(
   "/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    //condition to check added here
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission Denied");
     }
-    //condition ends
     console.log(req.params);
-    users.findOneAndDelete({ MovieID });
-    const { MovieID } = req.params;
-    try {
-      const updatedUser = await User.findOneAndUpdate(
-        { Username: Username },
-        {
-          $pull: { FavoriteMovies: MovieID },
-        },
+    await users
+      .findOneAndUpdate(
+        { Username: req.params.Username },
+        { $push: { FavoriteMovies: req.params.MovieID } },
         { new: true }
-      );
-      let user = users.find((user) => user.id == id);
-      if (!updatedUser) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      if (user) {
-        user.Favoritemovies = user.Favoritemovies.filter(
-          (title) => title !== movieID
-        );
-        res
-          .status(200)
-          .send(" ${movieTitle} has been removed from ${id}s array");
-      } else {
-        res.status(400).send("no such movie");
-      }
-
-      res.json(updatedUser);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
-    }
+      )
+      .then((updatedUser) => {
+        res.json(UpdatedUser);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send("Error: " + err);
+      });
   }
 );
 
