@@ -39,6 +39,7 @@ require("./passport");
 // include(s) new validator as middleware to the routes that require validation
 const { check, validationResult } = require("express-validator");
 
+
 let allowedOrigins = [
   "http://localhost:8080",
   "https://cinemark-movie-flix-d567da194f3d.herokuapp.com",
@@ -125,12 +126,18 @@ app.post(
 // add a movie to a user's list of favorites
 app.post(
   "/users/:Username/movies/:MovieID", [
-
-
+    check("Username", "username is required").isLength({min:5})
   ],
   
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission denied");
     }
@@ -167,6 +174,13 @@ app.put(
 
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     //condition to check added here
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission Denied");
@@ -201,6 +215,13 @@ app.delete(
   "/users/:Username",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     //condition to check added here
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission Denied");
@@ -227,6 +248,13 @@ app.delete(
   "/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission Denied");
     }
@@ -259,6 +287,13 @@ app.get(
   "/users",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     //condition to check added here
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission Denied");
@@ -281,6 +316,13 @@ app.get(
   "/users/:Username",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     //condition to check added here
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission Denied");
@@ -303,6 +345,13 @@ app.get(
   "/movies",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     await movies
       .find()
       .then((movies) => {
@@ -320,6 +369,13 @@ app.get(
   "/movies/:Title",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     await movies
       .findOne({ Title: req.params.Title })
       .then((movies) => {
@@ -337,6 +393,13 @@ app.get(
   "/movies/genres/:GenreName",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     movies
       .find({ Genre: req.params.GenreName })
       .then((movies) => {
@@ -357,6 +420,13 @@ app.get(
   "/movies/directors/:DirectorName",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        errors: errors.array(),
+      });
+    }
     await movies
       .findOne({ "Director.Name": req.params.directorName })
       .then((movies) => {
