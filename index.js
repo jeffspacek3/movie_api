@@ -45,9 +45,6 @@ let allowedOrigins = [
   "http://localhost:1234",
 ];
 
-/* creates a list of allowed domains within the variable(allowedOrigins),
-then compares the domains of any incoming request with this list and either allows (if the domain is on the list) it
-or return an error (if the domain isn't on the list) */
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -74,22 +71,17 @@ app.use(
   Birthday: Date
 }*/
 
-// allow new users to register
+// Allow new users to register
 app.post(
-  "/users/",
-  /*
-    Validation logic here for request
-    -you can either use a chain of methods like .not().isEmpty()
-    -which means "opposite of isEmpty" in plain english "is not empty"
-    -or use .isLength({min: 5}) which means
-    -minimum value of 5 characters are only allowed
-    */
-  /*[
-    check("Username", "Username is required").isLength({min: 5}),
-    check("Username", "Username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
-    check("Password", "Password is required").not().isEmpty(),
-    check("Email", "Email does not appear to be valid").isEmail()
-  ],*/
+  "/users/", [
+    check("Username", "username is required").isLength({min:5}),
+    check("Username", "username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
+    check("Passowrd", "Password is required").not().isEmpty,
+    check("Email", "Email does not appear to be valid").isEmail(),
+    check("Email", "Email is required").not().isEmpty,
+    check("Birthday", "Birthday is required").not().isEmpty,
+  ],
+
   async (req, res) => {
     //check the validation object for errors
     let errors = validationResult(req);
@@ -132,7 +124,11 @@ app.post(
 
 // add a movie to a user's list of favorites
 app.post(
-  "/users/:Username/movies/:MovieID",
+  "/users/:Username/movies/:MovieID", [
+
+
+  ],
+  
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     if (req.user.Username !== req.params.Username) {
@@ -156,18 +152,19 @@ app.post(
 );
 
 // Update a user's info, by username
-/* JSON required in this format
-{
-  Username: String,
-  (required)
-  Password: String,
-  (required)
-  Email: String,
-  (required)
-  Birthday: Date
-}*/
 app.put(
-  "/users/:Username",
+  "/users/:Username", [
+    check("Username", "username is required").isLength({min:5}),
+    check("Username", "username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
+    check("Passowrd", "Password is required").not().isEmpty,
+    check("Email", "Email does not appear to be valid").isEmail(),
+    check("Email", "Email is required").not().isEmpty,
+    check("Birthday", "Birthday is required").not().isEmpty,
+    check('email', 'Email is required').notEmpty(),
+    check('email', 'Email does not appear to be valid').isEmail()
+    
+  ],
+
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     //condition to check added here
