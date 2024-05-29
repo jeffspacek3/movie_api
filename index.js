@@ -39,9 +39,9 @@ require("./passport");
 // include(s) new validator as middleware to the routes that require validation
 const { check, validationResult } = require("express-validator");
 
-
 let allowedOrigins = [
   "http://localhost:8080",
+  "http://localhost:4200",
   "https://cinemark-movie-flix-d567da194f3d.herokuapp.com",
   "http://localhost:1234",
 ];
@@ -74,13 +74,17 @@ app.use(
 
 // Allow new users to register
 app.post(
-  "/users/", [
-    check("Username", "username is required").isLength({min:5}),
-    check("Username", "username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
-    check("Passowrd", "Password is required").not().isEmpty,
+  "/users/",
+  [
+    check("Username", "username is required").isLength({ min: 5 }),
+    check(
+      "Username",
+      "username contains non alphanumeric characters - not allowed."
+    ).isAlphanumeric(),
+    check("Passowrd", "Password is required").not().isEmpty(),
     check("Email", "Email does not appear to be valid").isEmail(),
-    check("Email", "Email is required").not().isEmpty,
-    check("Birthday", "Birthday is required").not().isEmpty,
+    check("Email", "Email is required").not().isEmpty(),
+    check("Birthday", "Birthday is required").not().isEmpty(),
   ],
 
   async (req, res) => {
@@ -125,10 +129,9 @@ app.post(
 
 // add a movie to a user's list of favorites
 app.post(
-  "/users/:Username/movies/:MovieID", [
-    check("Username", "username is required").isLength({min:5})
-  ],
-  
+  "/users/:Username/movies/:MovieID",
+  [check("Username", "username is required").isLength({ min: 5 })],
+
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     //check the validation object for errors
@@ -160,16 +163,19 @@ app.post(
 
 // Update a user's info, by username
 app.put(
-  "/users/:Username", [
-    check("Username", "username is required").isLength({min:5}),
-    check("Username", "username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
+  "/users/:Username",
+  [
+    check("Username", "username is required").isLength({ min: 5 }),
+    check(
+      "Username",
+      "username contains non alphanumeric characters - not allowed."
+    ).isAlphanumeric(),
     check("Passowrd", "Password is required").not().isEmpty,
     check("Email", "Email does not appear to be valid").isEmail(),
     check("Email", "Email is required").not().isEmpty,
     check("Birthday", "Birthday is required").not().isEmpty,
-    check('email', 'Email is required').notEmpty(),
-    check('email', 'Email does not appear to be valid').isEmail()
-    
+    check("email", "Email is required").notEmpty(),
+    check("email", "Email does not appear to be valid").isEmail(),
   ],
 
   passport.authenticate("jwt", { session: false }),
