@@ -418,8 +418,8 @@ app.get(
   }
 );
 
-// needswork!
-//input 1 director, sends another specific director......
+/*needswork!
+/input 1 director, sends another specific director */
 
 // read movie(s) by director
 app.get(
@@ -467,18 +467,18 @@ app.listen(port, "0.0.0.0", () => {
   console.log("Listening on Port " + port);
 });
 
-/* End Notes
-
-
-TO-DO LIST
--add/delete a users movie from their favorites list
--read director by name
-
-Bonus tasks
-//allo users to see which actors star in which movies
-//allow users to view information about different actors
-//allow users to view more information about different movies
-//allow users to crate a to watch list
-// install... txt.log recording code...
-
+/** End Notes
+*
+*
+*TO-DO LIST
+*-add/delete a users movie from their favorites list
+*-read director by name
+*
+*Bonus tasks
+*allo users to see which actors star in which movies
+*allow users to view information about different actors
+*allow users to view more information about different movies
+*allow users to crate a to watch list
+*install... txt.log recording code...
+*
 */
