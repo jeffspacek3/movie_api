@@ -44,6 +44,7 @@ let allowedOrigins = [
   "http://localhost:4200",
   "https://cinemark-movie-flix-d567da194f3d.herokuapp.com",
   "http://localhost:1234",
+  "https://99movies.netlify.app"
 ];
 
 app.use(
