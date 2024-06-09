@@ -66,11 +66,11 @@ This API provide users with access to information about different movies, direct
 * Response body; A JSON obejct holdign datea about the updated user information
 
 ### Delete Movie from Users Favorite Movie List
-* URL: 
+* URL: ``` /users/[Username]/movies/[MovieID] ```
 * Request body: none
 * Response body: A JSON object holding data about the update duser information
 
 ### Delete User
-* URL:
+* URL:``` /users/[Username] ```
 * Request Body: None
 * Response Body: Text message indicating whether the user deregister successfully
